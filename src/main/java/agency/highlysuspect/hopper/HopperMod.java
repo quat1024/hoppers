@@ -8,17 +8,19 @@ import net.minecraft.block.material.Material;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
+import net.minecraftforge.client.MinecraftForgeClient;
 import net.minecraftforge.common.Configuration;
+import net.minecraftforge.common.MinecraftForge;
 
 import java.io.File;
 import java.util.logging.Logger;
 
 @Mod(
-	name = Hopper.NAME,
-	version = Hopper.VERSION,
-	modid = Hopper.MODID
+	name = HopperMod.NAME,
+	version = HopperMod.VERSION,
+	modid = HopperMod.MODID
 )
-public class Hopper {
+public class HopperMod {
 	public static final String NAME = "Hopper";
 	public static final String MODID = "hopper";
 	public static final String VERSION = "${version}";
@@ -50,6 +52,9 @@ public class Hopper {
 		}
 		
 		//TODO: Mess with LanguageRegistry.loadLangaugeTable
-		LanguageRegistry.addName(blockRedstone, "Redstone Block");
+		LanguageRegistry.addName(blockRedstone, "Block of Redstone");
+		
+		//TODO: Use a proxy like a real modder lol
+		MinecraftForgeClient.preloadTexture("gfx/hopper/blocks.png");
 	}
 }

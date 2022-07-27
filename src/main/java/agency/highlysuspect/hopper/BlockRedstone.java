@@ -6,11 +6,21 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeDirection;
 
-import java.util.Random;
-
 public class BlockRedstone extends Block {
 	public BlockRedstone(int id, Material material) {
 		super(id, material);
+	}
+	
+	//Appearance
+	
+	@Override
+	public String getTextureFile() {
+		return "gfx/hopper/blocks.png";
+	}
+	
+	@Override
+	public int getBlockTextureFromSide(int par1) {
+		return 0;
 	}
 	
 	//Placing, breaking
