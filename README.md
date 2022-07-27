@@ -2,14 +2,12 @@
 
 It's just a hopper. Thanks to unascribed and TwilightFlower for doing the toolchain heavy lifting and for providing an example[.](https://github.com/BuildCraft/BuildCraft/tree/3.4.x)
 
-#### hey quat you use windows, but una says the script only supports linux. How did you build this
+### hey quat you use windows, but una says the script only supports linux. How did you build this
 
-Could try to convert it to a batch file but didn't feel like it. Git bash also doesn't have `zip`, which is used on the last line... I mean I could do that step manually but why do it the easy way when!!!!!!
-
-What I actually did:
+Could try to convert it to a batch file but didn't feel like it. "Git bash" also doesn't have `zip`, which is used on the last line, and it's hard to add packaged on git bash... I mean I could do that zip step manually but why do it the easy way when!!!!!!
 
 * get WSL debian (i think i got debian stretch (9)).
-* You need specifically Java 11 to use gradle in the VM, so follow directions in [this mf](https://linuxize.com/post/install-java-on-debian-9/)
+* You need specifically Java 11 in the VM to use gradle (just a limitation of this project), so follow directions in [this mf](https://linuxize.com/post/install-java-on-debian-9/)
   * add the stretch-backports repo: `echo 'deb http://ftp.debian.org/debian stretch-backports main' | sudo tee /etc/apt/sources.list.d/stretch-backports.list`
   * `sudo apt update` and `sudo apt install openjdk-11-jdk`. Tada
 * Get file compression utilities required by the script into the VM: `sudo apt install zip unzip`

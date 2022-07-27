@@ -7,20 +7,11 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeDirection;
 
 public class BlockRedstone extends Block {
-	public BlockRedstone(int id, Material material) {
-		super(id, material);
-	}
-	
-	//Appearance
-	
-	@Override
-	public String getTextureFile() {
-		return "gfx/hopper/blocks.png";
-	}
-	
-	@Override
-	public int getBlockTextureFromSide(int par1) {
-		return 0;
+	public BlockRedstone(int id) {
+		super(id, 0, Material.rock);
+		setHardness(2);
+		
+		setTextureFile("gfx/hopper/blocks.png");
 	}
 	
 	//Placing, breaking
