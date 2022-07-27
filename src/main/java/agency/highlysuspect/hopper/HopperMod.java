@@ -9,18 +9,13 @@ import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.LanguageRegistry;
 import net.minecraft.block.Block;
-import net.minecraft.block.material.Material;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.client.MinecraftForgeClient;
 import net.minecraftforge.common.Configuration;
-import net.minecraftforge.common.MinecraftForge;
 
 import java.io.File;
-import java.util.Arrays;
-import java.util.List;
 import java.util.logging.Logger;
 
 @Mod(
@@ -40,8 +35,9 @@ public class HopperMod {
 	public static Configuration config;
 	
 	public static BlockRedstone blockRedstone;
-	public static ItemBlock itemBlockRedstone;
 	public static BlockHopper blockHopper;
+	
+	public static ItemBlock itemBlockRedstone;
 	public static ItemBlock itemBlockHopper;
 	
 	@Mod.PreInit
@@ -49,21 +45,28 @@ public class HopperMod {
 		LOGGER.setParent(FMLLog.getLogger());
 		LOGGER.info("Hello world!");
 		
+		//Blocks
 		config = new Configuration(new File(pre.getModConfigurationDirectory(), "hopper.conf"));
 		try {
 			config.load();
-			
 			blockRedstone = new BlockRedstone(config.getBlock("hopper-redstoneBlock.id", 730).getInt());
-			blockRedstone.setBlockName("hopper-redstoneBlock");
-			itemBlockRedstone = new HmmItemBlock(blockRedstone.blockID - 256, CreativeTabs.tabRedstone);
-			
 			blockHopper = new BlockHopper(config.getBlock("hopper-hopperBlock.id", 731).getInt());
-			blockHopper.setBlockName("hopper-hopperBlock");
-			itemBlockHopper = new HmmItemBlock(blockHopper.blockID - 256, CreativeTabs.tabRedstone);
 		} finally {
 			config.save();
 		}
 		
+		blockRedstone.setBlockName("hopper-redstoneBlock");
+		blockHopper.setBlockName("hopper-hopperBlock");
+		
+		//Items
+		itemBlockRedstone = new HmmItemBlock(blockRedstone.blockID - 256, CreativeTabs.tabRedstone);
+		itemBlockHopper = new HmmItemBlock(blockHopper.blockID - 256, CreativeTabs.tabRedstone);
+		itemBlockHopper.setIconIndex(1);
+		
+		//Tile entities
+		GameRegistry.registerTileEntity(TileHopper.class, "hopper-hopperBlockTile");
+		
+		//Language entries?
 		//TODO: Mess with LanguageRegistry.loadLangaugeTable and do this correctly lol
 		LanguageRegistry.addName(blockRedstone, "Block of Redstone");
 		LanguageRegistry.addName(blockHopper, "Hopper");

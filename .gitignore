@@ -13,3 +13,7 @@
 lol.sh
 buildcraft*.jar
 .idea/
+
+# Dammit krita
+*.png~
+*.kra-autosave

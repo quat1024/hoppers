@@ -8,10 +8,10 @@ import net.minecraftforge.common.ForgeDirection;
 
 public class BlockRedstone extends Block {
 	public BlockRedstone(int id) {
-		super(id, 0, Material.rock);
-		setHardness(2);
-		
-		setTextureFile("gfx/hopper/blocks.png");
+		super(id, 0, Material.iron);
+		setResistance(6);
+		setHardness(5);
+		setTextureFile(HopperMod.proxy.ATLAS);
 	}
 	
 	//Placing, breaking
@@ -29,6 +29,7 @@ public class BlockRedstone extends Block {
 	
 	@Override
 	public void breakBlock(World world, int x, int y, int z, int par5, int par6) {
+		super.breakBlock(world, x, y, z, par5, par6);
 		world.notifyBlocksOfNeighborChange(x, y - 1, z, this.blockID);
 		world.notifyBlocksOfNeighborChange(x, y + 1, z, this.blockID);
 		world.notifyBlocksOfNeighborChange(x - 1, y, z, this.blockID);

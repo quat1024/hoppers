@@ -20,9 +20,7 @@ Use `java.util.logging.Logger`. If you have modded newer versions, this class mi
 
 ## Events
 
-Lifecycle events are registered by annotating them with `@Mod.PreInit`, `@Mod.Init` etc.
-
-Todo: learn how other events work!
+Lifecycle events are registered by annotating them with `@Mod.PreInit`, `@Mod.Init` etc. For other events, stick the event handlers as methods in a class, annotate the methods with `ForgeSubscribe`, then call `MinecraftForge.EVENT_BUS.register(ThatClass.class).
 
 ## Configuration
 
@@ -84,12 +82,26 @@ To choose a non-vanilla texture atlas for your blocks and items, call `Minecraft
 
 To choose a different texture index for your blocks - if you have a simple block that is the same texture on all sides, pass it as the second parameter in the three-argument Block constructor. You can also override `getBlockTextureFromSide` or `getBlockTextureFromSideAndMetadata` for cuboid blocks with different textures on each face (see `ForgeDirection` for the meaning of the `side` parameter, tldr 0-5 -> down up north south west east)
 
-To choose a different texture index for your items, call `setIconCoord` with the X and Y position of the texture index (it computes `y * 16 + x` for you), or set `Item.iconIndex` directly.
+To choose a different texture index for your items, call `setIconCoord` with the X and Y position of the texture index (it computes `y * 16 + x` for you), or directly with `setIconIndex`.
 
-# Models
+## Models
 
 Override `Block#getRenderType`. This is used in `RenderBlocks#renderBlockByRenderType` which switches off the returned int and... dispatches to a giant list of block models. 0 is a standard block consisting of one cuboid (mercifully calling `getBlockBounds` to allow for non-fullcubes), 1 is a flower or sapling cross model, 2 is a torch, etc etc.
 
 Forge adds a `default` case that passes through to `RenderingRegistry.renderWorldBlock`. Obtain a unique render type int ID with `RenderingRegistry.getNextAvailableRenderID`, then add an `ISimpleBlockRenderingHandler` with `RenderingRegistry.registerBlockHandler`. Return the render type ID in your `getRenderType`.
 
-You will probably want to look at vanilla `RenderBlocks` for examples of how to work with the model mesher. You will interact with `Tesselator.instance` most likely.
+You will probably want to look at vanilla `RenderBlocks` for examples of how to work with the model mesher. You will interact with `Tesselator.instance`, most likely.
+
+## Tile entities
+
+Not "block entities"! This is MCP.
+
+Vanilla requires blocks to implement `BlockContainer` and implement the abstract method `createNewTileEntity` to make the tile entity. Forge seems to extend this; you can override `hasTileEntity` and create/return the tile entity in `createTileEntity`, both of which are now metadata-sensitive. If you don't need to extend another base class, it doesn't hurt to extend BlockContainer, which also takes care of common utilities such as adding and removing the TileEntity when you place and break the block.
+
+To register the tileentity class itself, call `GameRegistry.registerTileEntity`. First param is the tile entity class, second param is a string which is the globally unique string ID of the tile entity. A zero-argument constructor is required for the reflective call in `TileEntity.createAndLoadEntity`.
+
+For tile entity special renderers, in the proxy call `ClientRegistry.bindTileEntitySpecialRenderer`. First param is the tile entity class again, second param is an instance of `TileEntitySpecialRenderer`.
+
+All tile entities are tickable. Override `updateEntity`.
+
+And that's pretty much all there is to it...

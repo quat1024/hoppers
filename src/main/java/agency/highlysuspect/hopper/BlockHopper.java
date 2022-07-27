@@ -1,31 +1,45 @@
 package agency.highlysuspect.hopper;
 
-import net.minecraft.block.Block;
+import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeDirection;
 
-public class BlockHopper extends Block {
+public class BlockHopper extends BlockContainer {
 	public BlockHopper(int id) {
 		super(id, Material.iron);
+		setHardness(2);
+		setTextureFile(HopperMod.proxy.ATLAS);
 	}
 	
-	public ForgeDirection getDirectionFromMeta(int meta) {
-		switch(meta) {
-			case 0: default: return ForgeDirection.DOWN;
-			case 1: return ForgeDirection.NORTH;
-			case 2: return ForgeDirection.SOUTH;
-			case 3: return ForgeDirection.EAST;
-			case 4: return ForgeDirection.WEST;
-		}
+	// Appearance
+	
+	@Override
+	public boolean renderAsNormalBlock() {
+		return false;
 	}
 	
-	public int getMetaFromDirection(ForgeDirection d) {
-		switch(d) {
-			case DOWN: default: return 0;
-			case NORTH: return 1;
-			case SOUTH: return 2;
-			case EAST: return 3;
-			case WEST: return 4;
-		}
+	@Override
+	public boolean isOpaqueCube() {
+		return false;
+	}
+	
+	@Override
+	public int getRenderType() {
+		return HopperMod.proxy.hopperBlockRenderType;
+	}
+	
+	@Override
+	public int getBlockTextureFromSide(int par1) {
+		//This is used for block particles
+		return 1;
+	}
+	
+	// Placing, breaking
+	
+	@Override
+	public TileEntity createNewTileEntity(World world) {
+		return new TileHopper();
 	}
 }
