@@ -1,0 +1,95 @@
+buildscript {
+	repositories {
+		//Currently my Voldeloom fork is required. See https://github.com/unascribed/voldeloom/pull/1
+		//1. Clone this: https://github.com/CrackedPolishedBlackstoneBricksMC/voldeloom/tree/1.4.7-gzip
+		//2. git checkout 1.4.7-gzip
+		//3. ./gradlew publishToMavenLocal
+		//4. then this line should pick up the voldeloom fork.
+		mavenLocal()
+		
+		//And now, for your regularly scheduled shit I copied from Buildcraft.
+		mavenCentral()
+		gradlePluginPortal()
+		maven { url "https://maven.fabricmc.net" }
+		maven { url "https://repo.sleeping.town" }
+	}
+	dependencies {
+		classpath "com.unascribed:voldeloom:1.0+1.4.7"
+	}
+}
+
+apply plugin: "java"
+apply plugin: "com.unascribed.voldeloom"
+
+sourceCompatibility = 6
+targetCompatibility = 6
+
+def forgeVersion = "1.4.7-6.6.2.534"
+def minecraft_version = "1.4.7"
+
+def mcp = "mcp726a.zip";
+def forgeZip = "forge${forgeVersion}.zip"
+def mcpForged = "mcp726a-forged.zip"
+
+if (!file(mcp).exists()) {
+	println "Downloading ${mcp} from archive.org..."
+	file(mcp).withOutputStream {
+		it << new URL("https://archive.org/download/minecraftcoderpack/minecraftcoderpack.zip/minecraftcoderpack%2F${project.minecraft_version}%2F${mcp}").openStream()
+	}
+}
+if (!file(forgeZip).exists()) {
+	println "Downloading Forge ${forgeVersion} source..."
+	file(forgeZip).withOutputStream {
+		it << new URL("https://maven.minecraftforge.net/net/minecraftforge/forge/${forgeVersion}/forge-${forgeVersion}-src.zip").openStream()
+	}
+}
+if (!file(mcpForged).exists()) {
+	println "Merging Forge config into MCP..."
+	"./merge-forge.sh".execute()
+}
+
+group = "agency.highlysuspect"
+archivesBaseName = "hopper-1.4.7"
+version = "0"
+
+repositories {
+	maven { url "https://maven.fabricmc.net/" }
+	maven { url "https://maven.minecraftforge.net/" }
+	maven { url "https://repo.spongepowered.org/maven" }
+}
+
+task remapSrc(type: Copy) {
+	inputs.property "version", project.version
+
+	from "common"
+
+	filesMatching('**/Hopper.java') {
+		expand 'version': project.version
+	}
+
+	into "build/filteredSrc"
+}
+
+compileJava.dependsOn remapSrc
+
+dependencies {
+	minecraft "com.mojang:minecraft:1.4.7"
+	forge "net.minecraftforge:forge:${forgeVersion}:universal@zip"
+	implementation "com.google.guava:guava:12.0.1"
+	mappings files(mcpForged)
+}
+
+processResources {
+	inputs.property "version", project.version
+
+	exclude "README.md"
+
+	filesMatching("mcmod.info") {
+		expand "version": project.version
+	}
+}
+
+tasks.withType(JavaCompile) {
+	options.encoding = "UTF-8"
+}
+

@@ -1,0 +1,18 @@
+[
+{
+	"modid": "hoppers",
+	"name": "Hoppers",
+	"description": "Adds hoppers.",
+	"version": "${version}",
+	"credits": "Thanks to unascribed, asie, and TwilightFlower for toolchain work and examples.",
+	"mcversion": "1.4.7",
+	"url": "https://highlysuspect.agency/",
+	"updateUrl": "",
+	"authors": ["quaternary"],
+	"parent": "",
+	"screenshots": [],
+	"dependencies": [
+		"mod_MinecraftForge"
+	]
+}
+]
