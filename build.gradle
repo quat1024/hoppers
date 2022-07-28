@@ -50,27 +50,13 @@ if (!file(mcpForged).exists()) {
 
 group = "agency.highlysuspect"
 archivesBaseName = "hopper-1.4.7"
-version = "0"
+version = "0" //Remember to change it in HopperMod.java too.
 
 repositories {
 	maven { url "https://maven.fabricmc.net/" }
 	maven { url "https://maven.minecraftforge.net/" }
 	maven { url "https://repo.spongepowered.org/maven" }
 }
-
-task remapSrc(type: Copy) {
-	inputs.property "version", project.version
-
-	from "common"
-
-	filesMatching('**/Hopper.java') {
-		expand 'version': project.version
-	}
-
-	into "build/filteredSrc"
-}
-
-compileJava.dependsOn remapSrc
 
 dependencies {
 	minecraft "com.mojang:minecraft:1.4.7"

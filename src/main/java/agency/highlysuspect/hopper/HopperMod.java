@@ -33,7 +33,7 @@ import java.util.logging.Logger;
 public class HopperMod {
 	public static final String NAME = "Hopper";
 	public static final String MODID = "hopper";
-	public static final String VERSION = "${version}";
+	public static final String VERSION = "0";
 	
 	public static final Logger LOGGER = Logger.getLogger(NAME);
 	

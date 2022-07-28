@@ -1,10 +1,11 @@
 [
 {
-	"modid": "hoppers",
-	"name": "Hoppers",
-	"description": "Adds hoppers.",
+	"modid": "hopper",
+	"name": "Hopper",
+	"description": "Adds hoppers!",
 	"version": "${version}",
-	"credits": "Thanks to unascribed, asie, and TwilightFlower for toolchain work and examples.",
+	"credits": "Thanks unascribed, asie, TwilightFlower",
+	"logoFile": "/gfx/hopper/logo.png",
 	"mcversion": "1.4.7",
 	"url": "https://highlysuspect.agency/",
 	"updateUrl": "",
