@@ -2,7 +2,6 @@ package agency.highlysuspect.hopper.render;
 
 import agency.highlysuspect.hopper.BlockHopper;
 import agency.highlysuspect.hopper.HopperMod;
-import agency.highlysuspect.hopper.render.HmmRenderBlocks;
 import cpw.mods.fml.client.registry.ISimpleBlockRenderingHandler;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.RenderBlocks;
