@@ -47,7 +47,7 @@ Kinda scant, but who's surprised. It's Minecraft.
 
 ## `@Mod`, basic forge interaction, etc
 
-Make a class and annotate it with `@Mod`. Fill out at least `modid` and that's all you need to get Forge to print info messages about loading your mod; fill out `version` to make it sstop complaining you didn't. Forge finds these annotations by scanning the whole damn classpath and the classpath scanning code blows up if there's anything compiled for a too-new Java version on there.
+Make a class and annotate it with `@Mod`. Fill out at least `modid` and that's all you need to get Forge to print info messages about loading your mod. Forge finds these annotations by scanning the whole damn classpath and the classpath scanning code blows up if there's anything compiled for a too-new Java version on there.
 
 Forge (as well as certain launchers) will look for an `mcmod.info` file in the root of the jar. This is a JSON file where you can fill in more metadata like a friendlier name for the mod, mod author, description, credits etc. Having an `mcmod.info` is not required. If you don't want to repeat yourself, make sure that the `modid` in the mcmod.info matches the one in your `@Mod` seriously i lost like half an hour of debugging to this, then set `useMetadata = true` in your `@Mod`, and properties like the mod's version and friendly name will be imported from there.
 
