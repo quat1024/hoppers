@@ -29,10 +29,9 @@ apply plugin: "com.unascribed.voldeloom"
 sourceCompatibility = 6
 targetCompatibility = 6
 
-// goofy zone
-
-ext.forgeVersion = "1.4.7-6.6.2.534"
-ext.minecraftVersion = "1.4.7"
+//Goofy Zone ~Ten Desires~ (modified a lot from the buildcraft one)
+def forgeVersion = "1.4.7-6.6.2.534"
+def minecraftVersion = "1.4.7"
 
 def mcp = "mcp726a.zip"
 def forgeZip = "forge${forgeVersion}.zip"
@@ -44,7 +43,7 @@ void get(File file, String url) {
 	if(file.length() == 0) throw new IllegalStateException("${url} downloaded as 0 bytes. Archive.org sometimes returns 0-byte files on 404s, double-check the url?")
 }
 
-if(!file(mcp).exists()) get(file(mcp), "https://archive.org/download/minecraftcoderpack/minecraftcoderpack.zip/minecraftcoderpack%2F${project.minecraftVersion}%2F${mcp}")
+if(!file(mcp).exists()) get(file(mcp), "https://archive.org/download/minecraftcoderpack/minecraftcoderpack.zip/minecraftcoderpack%2F${minecraftVersion}%2F${mcp}")
 if(!file(forgeZip).exists()) get(file(forgeZip), "https://maven.minecraftforge.net/net/minecraftforge/forge/${forgeVersion}/forge-${forgeVersion}-src.zip")
 if(!file(mcpForged).exists()) {
 	println "Merging Forge config into MCP..."
@@ -53,15 +52,15 @@ if(!file(mcpForged).exists()) {
 	Path forgeZipPath = file(forgeZip).toPath()
 	Path mcpForgedPath = file(mcpForged).toPath()
 	
-	//start by copying forgeZip to mcpForged
 	Files.copy(mcpZipPath, mcpForgedPath, StandardCopyOption.REPLACE_EXISTING)
 	
-	//merge forge.zip/forge/fml/conf into mcp-forged.zip/conf/
+	//modify the zip in-place.
+	//Take forge's mcp config (located at forge.zip/forge/fml/conf) and paste it over mcp.zip (at mcp726a-forged.zip/conf)
 	FileSystems.newFileSystem(mcpForgedPath, null).withCloseable { mcpForgedFs ->
 		FileSystems.newFileSystem(forgeZipPath, null).withCloseable { forgeZipFs ->
 			Files.walk(forgeZipFs.getPath("/forge/fml/conf")).forEach { src -> 
 				if(Files.isRegularFile(src)) {
-					Path dst = mcpForgedFs.getPath(src.toString().substring("/forge/fml".length()))
+					Path dst = mcpForgedFs.getPath(src.toString().substring("/forge/fml".length())) //hopefully this works lol
 					println "Copying ${src} (${src.fileSystem}) into ${dst} (${dst.fileSystem})"
 					Files.createDirectories(dst.parent)
 					Files.copy(src, dst, StandardCopyOption.REPLACE_EXISTING)
@@ -70,7 +69,7 @@ if(!file(mcpForged).exists()) {
 		}
 	}
 }
-// end goofy zone
+//end goofy zone
 
 group = "agency.highlysuspect"
 archivesBaseName = "hopper"
