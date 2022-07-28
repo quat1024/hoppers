@@ -75,10 +75,8 @@ public class HopperMod {
 		//Tile entities
 		GameRegistry.registerTileEntity(TileEntityHopper.class, "hopper-hopperBlockTile");
 		
-		//Language entries?
-		//TODO: Mess with LanguageRegistry.loadLangaugeTable and do this correctly lol
-		LanguageRegistry.addName(blockRedstone, "Block of Redstone");
-		LanguageRegistry.addName(blockHopper, "Hopper");
+		//Language entries
+		LanguageRegistry.instance().loadLocalization("/lang/hopper/en_US.properties", "en_US", false);
 	}
 	
 	@Mod.Init
