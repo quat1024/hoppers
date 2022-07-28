@@ -12,8 +12,6 @@ Scant.
 
 Make a class and annotate it with `@Mod`. Fill out at least `version` and `modid`. There is nothing else you need to do. I'm not sure exactly how Forge discovers that this class exists - there's no metadata written to the jar or anything - but it does.
 
-The `@Mod.SidedProxy` annotation is a service that constructs a different class depending on the physical side, pass the fully qualified class name on the `clientSide` and `serverSide` attributes. If you've written forge 1.12 this will be familiar.
-
 ## Logging
 
 Use `java.util.logging.Logger`. If you have modded newer versions, this class might be in your "exclude from auto-import" list because it kept coming up when you actually wanted the logger from Log4j. You **must** call `setParent(FMLLog.getLogger());` on your logger, or messages written to it will not appear in the game log. This is a gotcha when making your first hello world mod.
@@ -21,6 +19,10 @@ Use `java.util.logging.Logger`. If you have modded newer versions, this class mi
 ## Events
 
 Lifecycle events are registered by annotating them with `@Mod.PreInit`, `@Mod.Init` etc. For other events, stick the event handlers as methods in a class, annotate the methods with `ForgeSubscribe`, then call `MinecraftForge.EVENT_BUS.register(ThatClass.class).
+
+## Sided Proxy
+
+The `@Mod.SidedProxy` annotation is a service that constructs a different class depending on the physical side, pass the fully qualified class name on the `clientSide` and `serverSide` attributes. This is a good place to squirrel away side-specific code from the classloading gremlin. If you've written forge 1.12 this will be familiar.
 
 ## Configuration
 
@@ -50,13 +52,15 @@ The `BlockItem` constructor takes an ID number, which is the ID of the block it 
 
 The `Item` constructor also adds to the `public static final Item[] itemsList` array so there is no separate step needed. (If you look at Buildcraft source it re-registers the item by manually putting it in the items list array, this is a probably a mistake or legacy code or something.)
 
-setCreativeTab does not appear to work, at least not for vanilla creative tabs? Overriding `Item#getCreativeTabs` seems to be enough. Investgate this.
+`BlockItem`s must have the same numeric ID as the `Block` they place. This is a well-used assumption - for example, `ItemStack#new(Block)` creates the itemstack by taking the numeric ID of the block, so it must correspond to an item.
+
+setCreativeTab does not appear to work, at least not for vanilla creative tabs? Overriding `Item#getCreativeTabs` seems to be enough. Investigate this.
 
 Todo: items that aren't `BlockItem`s, are they different?
 
 ### Important note about classes
 
-Forge keeps track of each block and item's *class* and stores it in level.dat, along with the numeric ID. If you change the class that implements a given block or item ID, Forge will display an interstitial warning screen when opening a world save. Keep this in mind when making updates.
+Forge keeps track of each block and item's *class* and stores it in level.dat, along with the numeric ID. If you change the name of the class that implements a given block or item ID, Forge will display an interstitial warning screen when opening a world save. Keep this in mind when making updates.
 
 ## Localization
 
@@ -64,7 +68,7 @@ Lang files are not automatically loaded. `LanguageRegistry`, a forge class, is y
 
 The easy way is to hardcode en_US lang entries with `LanguageRegistry.addName`. Pass in a Block or Item as the first parameter and the English name of the thing as the second parameter. Done. To support multiple languages, call `LanguageRegistry.instance().addNameForObject()` with the language identifier in the middle parameter.
 
-The moderately more difficult way is to use `LanguageRegistry.instance().loadLocalization`. This takes the name of a file to load with `Class.getResource` + the language identifier that the file is for, and feeds it to a java `Properties` instance. The third parameter controls whether it goes to the familiar key-value `.properties` parser (false) or the XML based one (true). Make sure to call `Block#setName` to configure a language key.
+The moderately more difficult way is to use `LanguageRegistry.instance().loadLocalization`. This takes the name of a file to load with `Class.getResource` + the language identifier that the file is for, and feeds it to a java `Properties` instance. The third parameter controls whether it goes to the familiar key-value `.properties` parser (false) or the XML based one (true). Make sure to call `Block#setName` to configure a language key. Don't forget to include a leading slash on the argument fed to `Class.getResource`.
 
 Make sure to capitalize the second half of language identifiers (en_US, not en_us). The lowercasening didn't happen yet.
 
@@ -82,15 +86,19 @@ To choose a non-vanilla texture atlas for your blocks and items, call `Minecraft
 
 To choose a different texture index for your blocks - if you have a simple block that is the same texture on all sides, pass it as the second parameter in the three-argument Block constructor. You can also override `getBlockTextureFromSide` or `getBlockTextureFromSideAndMetadata` for cuboid blocks with different textures on each face (see `ForgeDirection` for the meaning of the `side` parameter, tldr 0-5 -> down up north south west east)
 
-To choose a different texture index for your items, call `setIconCoord` with the X and Y position of the texture index (it computes `y * 16 + x` for you), or directly with `setIconIndex`.
+To choose a different texture index for your items, call `setIconCoord` with the X and Y position of the texture index (it computes `y * 16 + x` for you), or directly with `setIconIndex`. Doing this on a `BlockItem` will turn off the 3d-model-in-inventory rendering, but note that the texture atlas used will be queried from the Block, not the item (you can override it, but that's Forge's default behavior)
 
 ## Models
 
-Override `Block#getRenderType`. This is used in `RenderBlocks#renderBlockByRenderType` which switches off the returned int and... dispatches to a giant list of block models. 0 is a standard block consisting of one cuboid (mercifully calling `getBlockBounds` to allow for non-fullcubes), 1 is a flower or sapling cross model, 2 is a torch, etc etc.
+The easiest models to make are solid cuboids. Override `getBlockTextureFromSide`/`getBlockTextureFromSideAndMetadata` to customize all six faces of the cube, and call `setBlockBounds` to make models smaller than a full block (the UVs are cropped accordingly, so if your block exists in the center of the blockspace, the texture should be in the center of the 16x16 cell).
 
-Forge adds a `default` case that passes through to `RenderingRegistry.renderWorldBlock`. Obtain a unique render type int ID with `RenderingRegistry.getNextAvailableRenderID`, then add an `ISimpleBlockRenderingHandler` with `RenderingRegistry.registerBlockHandler`. Return the render type ID in your `getRenderType`.
+The next hardest models to make are retextures of existing vanilla models. Override `Block#getRenderType`. This is used in `RenderBlocks#renderBlockByRenderType` which switches off the returned int and... dispatches to a giant list of block models. 0 is the standard "block consisting of one cuboid", 1 is a flower or sapling cross model, 2 is a torch, etc etc. These generally have some unspoken assumptions about what kinds of textures you return from which sides of the block, or sometimes don't even support different textures per-face; read the implementation code carefully.
 
-You will probably want to look at vanilla `RenderBlocks` for examples of how to work with the model mesher. You will interact with `Tesselator.instance`, most likely.
+At a fairly significant step up in difficulty, you can make fully custom meshed blocks. Forge adds a `default` case to the big switch that passes through to `RenderingRegistry.renderWorldBlock`. Obtain a unique render type int ID with `RenderingRegistry.getNextAvailableRenderID`, then add an `ISimpleBlockRenderingHandler` with `RenderingRegistry.registerBlockHandler`. Return the render type ID in your block's `getRenderType` and now your rendering handler will be called when it's time to mesh the block. You will probably want to look at vanilla `RenderBlocks` for examples of how to work with the model mesher. You will interact with `Tesselator.instance`, most likely.
+
+(Consider it a creative push to stay closer to Minecraft's blocky art style.)
+
+If you go wild with custom models, don't forget about the block break and running-on-block particles. These are still sourced from the Block's regular texture file and texture index, so make sure to put something sensible there.
 
 ## Tile entities
 
@@ -98,10 +106,14 @@ Not "block entities"! This is MCP.
 
 Vanilla requires blocks to implement `BlockContainer` and implement the abstract method `createNewTileEntity` to make the tile entity. Forge seems to extend this; you can override `hasTileEntity` and create/return the tile entity in `createTileEntity`, both of which are now metadata-sensitive. If you don't need to extend another base class, it doesn't hurt to extend BlockContainer, which also takes care of common utilities such as adding and removing the TileEntity when you place and break the block.
 
-To register the tileentity class itself, call `GameRegistry.registerTileEntity`. First param is the tile entity class, second param is a string which is the globally unique string ID of the tile entity. A zero-argument constructor is required for the reflective call in `TileEntity.createAndLoadEntity`.
+To register the tileentity class itself, call `GameRegistry.registerTileEntity`. First param is the tile entity class, second param is a string which is the globally unique string ID of the tile entity. A zero-argument constructor on the TileEntity class is required for the reflective call in `TileEntity.createAndLoadEntity`.
 
 For tile entity special renderers, in the proxy call `ClientRegistry.bindTileEntitySpecialRenderer`. First param is the tile entity class again, second param is an instance of `TileEntitySpecialRenderer`.
 
-All tile entities are tickable. Override `updateEntity`.
+All tile entities are tickable, override `updateEntity`. In an example of a truly terrible MCP name, `markDirty`/`setChanged` is spelled as `TileEntity#onInventoryChanged`. And that's pretty much all there is to tile entities, much simpler than it is in the recent versions.
 
-And that's pretty much all there is to it...
+# Things that are not bugs in your mod
+
+The text in container guis gets slightly lighter in color when you are holding an item in your hand. It just does that.
+
+Your hand still bobs up and down when trying to place a block in a position where it doesn't fit, it doesn't mean the item was implemented wrong.

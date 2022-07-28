@@ -15,10 +15,7 @@ public class GuiHopper extends GuiContainer {
 	
 	@Override
 	protected void drawGuiContainerForegroundLayer(int i, int j) {
-		String name = StringTranslate.getInstance().translateKey("tile.hopper-hopperBlock.name");
-		int strWidth = fontRenderer.getStringWidth(name);
-		fontRenderer.drawString(name, this.xSize / 2 - strWidth / 2, 6, 0x404040);
-		
+		fontRenderer.drawString(StringTranslate.getInstance().translateKey("container.hopper-hopperBlock"), 8, 6, 0x404040);
 		fontRenderer.drawString(StringTranslate.getInstance().translateKey("container.inventory"), 8, 39, 0x404040);
 	}
 	
