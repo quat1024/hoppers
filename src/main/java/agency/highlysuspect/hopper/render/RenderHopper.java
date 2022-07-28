@@ -36,11 +36,14 @@ public class RenderHopper implements ISimpleBlockRenderingHandler {
 	
 	@Override
 	public boolean renderWorldBlock(IBlockAccess world, int x, int y, int z, Block block, int modelId, RenderBlocks renderBlocks) {
+		if(!(block instanceof BlockHopper)) return false;
+		BlockHopper hopper = (BlockHopper) block; 
+		
 		//The model FORTUNATELY has some scheme where the UV always matches the world coordinates or something.
 		//Like if you're drawing on the left side of the block the UV will be on the left side of the texture.
 		//This plays really well with how overrideBlockBounds works.
 		
-		ForgeDirection dir = BlockHopper.directionFromMeta(world.getBlockMetadata(x, y, z));
+		ForgeDirection dir = hopper.directionFromMeta(world.getBlockMetadata(x, y, z));
 		boolean flipVertically = dir == ForgeDirection.UP;
 		
 		//Bowl base
