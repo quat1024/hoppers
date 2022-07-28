@@ -1,0 +1,7 @@
+0, 0 (0): blocks/redstone_block.png from Minecraft 1.7.10
+0, 1 (1): items/hopper.png from Minecraft 1.7.10
+1, 0 (16): blocks/hopper_inside.png from Minecraft 1.7.10
+1, 1 (17): blocks/hopper_outside.png from Minecraft 1.7.10
+1, 2 (18): blocks/hopper_top.png from Minecraft 1.7.10
+
+All textures originate from Mojang.
