@@ -26,8 +26,8 @@ Mods using Voldeloom:
 
 Existing codebases retrofitted with Voldeloom:
 
-* [ChiselRetro](https://git.sleeping.town/unascribed/ChiselRetro) (migrated from ForgeGradle 1)
-* [Buildcraft 3.4.x](https://github.com/BuildCraft/BuildCraft/tree/3.4.x) (migrated from idk)
+* [ChiselRetro](https://git.sleeping.town/unascribed/ChiselRetro)
+* [Buildcraft 3.4.x](https://github.com/BuildCraft/BuildCraft/tree/3.4.x) (migrated from Ant)
 
 These exist in various stages of Voldeloom's own development so expect weirdness. If you'd like to compile them yourself, you may need to make sure Voldeloom's version is `1.0.1` or newer because of [this](https://github.com/unascribed/voldeloom/pull/1).
 
@@ -47,9 +47,9 @@ Kinda scant, but who's surprised. It's Minecraft.
 
 ## `@Mod`, basic forge interaction, etc
 
-Make a class and annotate it with `@Mod`. Fill out at least `modid` (because it's required) and `version` (because the loader will complain if you don't), and that's all you need to get Forge to print info messages about loading your mod. Forge scans the classpath to find classes with this annotation and the classpath scanning code blows up if there's anything compiled for a too-new Java version on there.
+Make a class and annotate it with `@Mod`. Fill out at least `modid` and that's all you need to get Forge to print info messages about loading your mod; fill out `version` to make it sstop complaining you didn't. Forge finds these annotations by scanning the whole damn classpath and the classpath scanning code blows up if there's anything compiled for a too-new Java version on there.
 
-Forge (as well as certain launchers) will look for an `mcmod.info` file in the root of the jar. This is a JSON file where you can fill in more metadata like a friendlier name for the mod, mod author, description, credits etc. Having an `mcmod.info` is not required. If you don't want to repeat yourself, make sure that the `modid` in the mcmod.info matches the one in your `@Mod` seriously i lost like half an hour of debugging to this, then set `useMetadata = true` in your `@Mod`, and properties like the mod version and friendly name will be imported from there.
+Forge (as well as certain launchers) will look for an `mcmod.info` file in the root of the jar. This is a JSON file where you can fill in more metadata like a friendlier name for the mod, mod author, description, credits etc. Having an `mcmod.info` is not required. If you don't want to repeat yourself, make sure that the `modid` in the mcmod.info matches the one in your `@Mod` seriously i lost like half an hour of debugging to this, then set `useMetadata = true` in your `@Mod`, and properties like the mod's version and friendly name will be imported from there.
 
 Lifecycle events are registered by making a one-argument method accepting, say, `FMLPreInitializationEvent`, and annotating them with `@Mod.PreInit`, `@Mod.Init` etc. For other runtime-fired events, stick the event handlers as methods in some class, annotate the methods with `@ForgeSubscribe`, then call `MinecraftForge.EVENT_BUS.register` with the class as the argument. There are three event busses; ores, terrain-gen, and everything else.
 
@@ -57,36 +57,33 @@ The `@SidedProxy` annotation is a service that constructs a different class depe
 
 If you've ever written forge 1.12 this should all feel very familiar.
 
+Btw, this version of Forge has some funny stuff like `ModLoader` integration (the ModLoader API was implemented in terms of the Forge API) and some stubbed bukkit stuff that didn't pan out. History!
+
 ## Logging
 
-Use `java.util.logging.Logger`. If you have modded newer versions, this class might be in your "exclude from auto-import" list because it kept coming up when you actually wanted the logger from Log4j.
-
-You **must** call `setParent(FMLLog.getLogger());` on your logger, or messages written to it will not appear in the game log. This is why your hello world mod isn't working.
+Use `java.util.logging.Logger`. If you have modded newer versions, this class might be in your "exclude from auto-import" list because it kept coming up when you actually wanted the logger from Log4j. You **must** call `setParent(FMLLog.getLogger());` on your logger, or messages written to it will not appear in the game log. This is why your hello world mod isn't working.
 
 ## Configuration
 
-**Make a configuration FIRST before registering blocks.** Blocks need manually assigned numeric IDs in this version. Forge has utilities for helping you assign globally unique IDs in Configuration. In preinit, make a Configuration with `new Configuration(new File(preinit.getModConfigurationDirectory(), "filename.conf"));` (.conf appears to be the thing Buildcraft uses).
+**Make a configuration FIRST before playing around with registering stuff.** Everything needs manually assigned numeric IDs in this version, and Configuration has utilities for helping you select them. In preinit, make a Configuration with `new Configuration(new File(preinit.getModConfigurationDirectory(), "filename.conf"));` (.conf appears to be the convention Buildcraft uses).
 
 ## Blocks
 
-Dispense block IDs from the `Configuration` using `getBlock`, passing a String ID that vaguely describes what your block is (only used as an identifier in the config file, nowhere else) and a preferred block ID number. Most blocks should prefer a value between 256 and 4096, because the ability to use block IDs greater than 256 in the first place is a giant Forge hack and the abstraction is a bit leaky. Worldgen still uses a `byte[]`. And in 1.4, block IDs less than 256 are a very precious commodity.
+Dispense block IDs from the `Configuration` using `getBlock`, passing a String ID that vaguely describes what your block is (only used as an identifier in the config file, nowhere else) and a preferred block ID number. Most blocks should prefer a value between 256 and 4096, because the ability to use block IDs greater than 256 in the first place is a giant Forge hack and the abstraction is a bit leaky... worldgen still uses a `byte[]`. And in 1.4, block IDs less than 256 are a very precious commodity.
 
-You may not get the ID you asked for because another mod got to it first. Always remember to call `config.save()` so that the automatically-assigned block IDs are saved to the config file.
+You may not get the ID you asked for because another mod got to it first. Always remember to call `config.save()` so that the block IDs you actually got are saved to the config file.
 
-`Block` has a two-argument and three-argument constructor. In each case, the first parameter is the numeric block ID dispensed from the config, and the last parameter is a `Material` that works kinda like modern-day materials (just a category vaguely defining the block). The middle parameter of the three-arg constructor is a texture index, defaulting to 0. I'll get to that later.
+`Block` has a two-argument and three-argument constructor. In each case, the first parameter is the numeric block ID dispensed from the config, and the last parameter is a `Material` that works kinda like modern-day materials (just a category vaguely defining the block). The middle parameter of the three-arg constructor is a texture index, defaulting to 0 and I'll get to that later.
 
 The `Block` constructor registers the block as a side effect. You can retrieve the `Block` instance with `Block.blocksList[blockId]`.
 
-Apart from that things should feel fairly familiar. Some funnies:
-
-* If a function takes a `World` or `IBlockAccess` with four int parameters, they are probably x/y/z/direction the call is coming from, or x/y/z/metadata.
-* If a block `isBlockNormalCube`, it cannot provide redstone power!
+Apart from that things should feel fairly familiar. `BlockPos` wasn't invented yet, and `EnumFacing` exists but it's only in the wacky world of dispenser behaviors, so if you see four int parameters they are probably x/y/z/direction. Or maybe they're x/y/z/metadata, because block metadata is a thing. This is before the Redstone Update, so if a block `isBlockNormalCube` it can't provide redstone power, and you can't provide power with a strength less than 15 anyways. Fun.
 
 ## Items
 
-In this version of Minecraft, block and item IDs are connected. An `ItemBlock` corresponds to a `Block` *because* they have the same numeric ID; `ItemStack#new(Block)` creates the item with the same numeric ID as the block, the default pick-block result of a block is whatever item has the same block ID.
+Block and item IDs are kinda connected? An `ItemBlock` corresponds to a `Block` *because* they have the same numeric ID; `ItemStack#new(Block)` creates the item with the same numeric ID as the block, the default pick-block result of a block is whatever item has the same block ID, etc etc.
 
-Forge prefers if you choose item IDs that are out-of-the-way of block IDs so that every block has a free slot for an `ItemBlock` if it wants one. The maximum item ID is 32,000 so there is more than enough room. If you are creating an item that is not an `ItemBlock`, you need to request an item ID from the `Configuration`, and a warning will be issued if you pick one less than 4,096. If you are creating an `ItemBlock` you do not need to request a new item ID.
+Forge prefers if you choose item IDs that are out-of-the-way of block IDs so that every block has a free slot for an `ItemBlock` if it wants one. The maximum item ID is 32,000. If you are creating an item that is not an `ItemBlock`, you need to request an item ID from the `Configuration`, and a warning will be issued if you pick one less than 4,096. If you are creating an `ItemBlock` you do not need to request a new item ID.
 
 Constructing an `Item` registers it too, just like blocks. (If you look at Buildcraft source it re-registers the item by manually putting it in the items list array, this is a probably a mistake or legacy code or something.)
 
@@ -98,7 +95,9 @@ An important wrinkle is that the `Item` and `ItemBlock` constructors expect you 
 
 Forge keeps track of each block and item's *class* and stores it in level.dat along with the numeric ID. If you change the name of the class that implements a given block or item ID, Forge will display an interstitial warning screen when opening a world save. Keep this in mind when making updates.
 
-Make sure to call `Block#setBlockName` and `Item#setItemName`. They are not "registry names" because those aren't invented yet, but some mods still expect this to be a *globally unique String* (i.e. put your modid into it) that's a little nicer than a numeric block ID. This is also the key used for localizations, `myBlock.setBlockName("mymod-hi")` will make it respond to the language key `tile.mymod-hi.name`.
+Block IDs are more limited than item IDs.
+
+Make sure to call `Block#setBlockName` and `Item#setItemName`. They are not "registry names", those aren't invented yet, but some mods still expect this to be a globally unique String (i.e. put your modid into it) that's a little nicer than a numeric block ID. This is also the key used for localizations, `myBlock.setBlockName("mymod-hi")` will make it respond to the language key `tile.mymod-hi.name`.
 
 ## Localization
 
@@ -124,7 +123,7 @@ To choose a non-vanilla texture atlas for your blocks and items, call `Minecraft
 
 To choose a different texture index for your blocks - if you have a simple block that is the same texture on all sides, pass it as the second parameter in the three-argument Block constructor. You can also override `getBlockTextureFromSide` or `getBlockTextureFromSideAndMetadata` for cuboid blocks with different textures on each face (see `ForgeDirection` for the meaning of the `side` parameter, tldr 0-5 -> down up north south west east)
 
-To choose a different texture index for your items - call `setIconCoord` with the X and Y position of the texture index (it computes `y * 16 + x` for you), or set the index directly with `setIconIndex`. Doing this on a `ItemBlock` will turn off the 3d-model-in-inventory rendering, but note that the texture atlas used will be queried from the Block, not the item (that's Forge's default behavior it adds in `ItemBlock`)
+To choose a different texture index for your items - call `setIconCoord` with the X and Y position of the texture index (it computes `y * 16 + x` for you), or set the index directly with `setIconIndex`. Doing this on a `ItemBlock` will turn off the 3d-model-in-inventory rendering, but note that the texture atlas used will be queried from the Block, not the item (that's Forge's default behavior it adds in `ItemBlock`, you can override it if you really need it)
 
 ## "Models"
 
@@ -144,7 +143,7 @@ I've been told that this system was kept pretty much unchanged through Minecraft
 
 Not "block entities"! This is MCP.
 
-Vanilla requires blocks to implement `BlockContainer` and implement the abstract method `createNewTileEntity` to make the tile entity. Forge seems to extend this; you can override `hasTileEntity` and create/return the tile entity in `createTileEntity`, both of which are now metadata-sensitive. If you don't need to extend another base class, it doesn't hurt to extend BlockContainer, which also takes care of common utilities such as adding and removing the TileEntity when you place and break the block.
+Vanilla requires blocks to implement `BlockContainer` and implement the abstract method `createNewTileEntity` to make the tile entity. Forge extends this; you can override `hasTileEntity` and make a new tile entity in `createTileEntity`, both of which are now metadata-sensitive. If you don't need to extend another base class, it doesn't hurt to extend BlockContainer, which also takes care of common utilities such as adding and removing the TileEntity when you place and break the block.
 
 To register the tileentity class itself, call `GameRegistry.registerTileEntity`. First param is the tile entity class, second param is a string which is the globally unique string ID of the tile entity. A zero-argument constructor on the TileEntity class is required for the reflective call in `TileEntity.createAndLoadEntity`.
 
@@ -156,6 +155,6 @@ All tile entities are tickable, override `updateEntity`. `markDirty`/`setChanged
 
 * The text in container guis gets slightly lighter in color when you are holding an item in your hand. It just does that.
 * Your hand still bobs up and down when trying to place a block in a position where it doesn't fit, it doesn't mean the item was implemented wrong.
-* A hand swing animation is displayed when clicking on any entity.
+* A hand swing animation is always displayed when right clicking on an entity.
 
-These are all Forge bugs lol.
+These are all Forge bugs lol. Actually the last one is a feature that lets you pet animals and/or your friends.
