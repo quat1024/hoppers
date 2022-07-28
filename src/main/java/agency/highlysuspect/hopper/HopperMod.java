@@ -1,11 +1,14 @@
 package agency.highlysuspect.hopper;
 
+import agency.highlysuspect.hopper.gui.GuiHandler;
 import agency.highlysuspect.hopper.proxy.CommonProxy;
 import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
+import cpw.mods.fml.common.network.NetworkMod;
+import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.LanguageRegistry;
 import net.minecraft.block.Block;
@@ -23,6 +26,10 @@ import java.util.logging.Logger;
 	version = HopperMod.VERSION,
 	modid = HopperMod.MODID
 )
+@NetworkMod(
+	clientSideRequired = true,
+	serverSideRequired = true
+)
 public class HopperMod {
 	public static final String NAME = "Hopper";
 	public static final String MODID = "hopper";
@@ -32,6 +39,8 @@ public class HopperMod {
 	
 	@SidedProxy(clientSide = "agency.highlysuspect.hopper.proxy.ClientProxy", serverSide = "agency.highlysuspect.hopper.proxy.CommonProxy")
 	public static CommonProxy proxy;
+	@Mod.Instance
+	public static HopperMod instance;
 	public static Configuration config;
 	
 	public static BlockRedstone blockRedstone;
@@ -75,6 +84,7 @@ public class HopperMod {
 	@Mod.Init
 	public void init(FMLInitializationEvent e) {
 		proxy.clientInit();
+		NetworkRegistry.instance().registerGuiHandler(instance, new GuiHandler());
 		
 		//9 redstone -> 1 redstone block
 		GameRegistry.addShapelessRecipe(new ItemStack(itemBlockRedstone), Item.redstone, Item.redstone, Item.redstone, Item.redstone, Item.redstone, Item.redstone, Item.redstone, Item.redstone, Item.redstone);

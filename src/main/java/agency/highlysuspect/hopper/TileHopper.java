@@ -17,8 +17,11 @@ public class TileHopper extends TileEntity implements IInventory {
 	
 	@Override
 	public boolean shouldRefresh(int oldID, int newID, int oldMeta, int newMeta, World world, int x, int y, int z) {
-		//Changes to metadata don't invalidate the block.
-		return oldID != newID;
+		//Changes to only metadata don't invalidate the tile entity, but I should be aware of them.
+		if(oldID != newID) return true;
+		
+		blockMetadata = newMeta;
+		return false;
 	}
 	
 	@Override

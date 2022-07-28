@@ -1,4 +1,4 @@
-package agency.highlysuspect.hopper;
+package agency.highlysuspect.hopper.render;
 
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
