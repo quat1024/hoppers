@@ -1,6 +1,12 @@
-# its just a hopper
+# Hopper
 
-It's just a hopper. Thanks to unascribed and TwilightFlower for doing the toolchain heavy lifting and for providing an example[.](https://github.com/BuildCraft/BuildCraft/tree/3.4.x)
+Adds hoppers to Minecraft!
+
+Thanks to unascribed and TwilightFlower for [doing the toolchain heavy lifting and for providing an example.](https://github.com/BuildCraft/BuildCraft/tree/3.4.x). And for being cool.
+
+# License
+
+`LGPL-3.0-or-later`, but also I literally do not give a shit if you take stuff for learning purposes and ship it in a released mod
 
 ### hey quat you use windows, but una says the script only supports linux. How did you build this
 

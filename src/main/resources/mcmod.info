@@ -4,7 +4,7 @@
 	"name": "Hopper",
 	"description": "Adds hoppers!",
 	"version": "${version}",
-	"credits": "Thanks unascribed, asie, TwilightFlower",
+	"credits": "Thanks to unascribed, asie, TwilightFlower",
 	"logoFile": "/gfx/hopper/logo.png",
 	"mcversion": "1.4.7",
 	"url": "https://highlysuspect.agency/",

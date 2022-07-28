@@ -68,12 +68,12 @@ dependencies {
 processResources {
 	inputs.property "version", project.version
 
-	exclude "README.md"
-
-	filesMatching("mcmod.info") {
+	filesMatching(["**/mcmod.info", "**/mods.toml"]) {
 		expand "version": project.version
 	}
 }
+
+tasks.jar.dependsOn(processResources)
 
 tasks.withType(JavaCompile) {
 	options.encoding = "UTF-8"

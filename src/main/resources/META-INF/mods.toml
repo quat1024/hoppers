@@ -1,0 +1,20 @@
+modLoader = "javafml"
+loaderVersion = "*"
+license = "LGPL-3.0-or-later"
+issueTrackerURL = "https://github.com/quat1024/hoppers/issues"
+logoFile = "gfx/hopper/logo.png"
+
+[[mods]]
+modId = "hopper"
+version = "${version}"
+displayName = "Hopper"
+description = "Adds hoppers!"
+authors = "quaternary"
+credits = "Thanks to unascribed, asie, and TwilightFlower for tooling work"
+
+[[dependencies.hopper]]
+modId = "minecraft"
+mandatory = true
+versionRange = "[1.4.7]" # Prankd
+
+# Yeah this is a fake mods.toml just to make recent forges blow up with a funny error message.
