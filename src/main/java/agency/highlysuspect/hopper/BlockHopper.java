@@ -95,7 +95,7 @@ public class BlockHopper extends BlockContainer {
 	
 	@Override
 	public TileEntity createNewTileEntity(World world) {
-		return new TileHopper();
+		return new TileEntityHopper();
 	}
 	
 	@Override
@@ -110,7 +110,7 @@ public class BlockHopper extends BlockContainer {
 	public void breakBlock(World world, int x, int y, int z, int par5, int par6) {
 		//LOOOOOLL there's no utility function for this in this version of Minecraft!! Haha
 		//I should probably split this out into one (but this mod only adds this one block entity, idk)
-		TileHopper hopper = (TileHopper) world.getBlockTileEntity(x, y, z); 
+		TileEntityHopper hopper = (TileEntityHopper) world.getBlockTileEntity(x, y, z); 
 		if(hopper != null) {
 			for(int i = 0; i < hopper.getSizeInventory(); i++) {
 				ItemStack stack = hopper.getStackInSlot(i);

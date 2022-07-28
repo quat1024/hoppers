@@ -88,8 +88,8 @@ public class TransferHelper {
 				hopperInventory.decrStackSize(i, howManyMoved);
 				
 				//TODO: Is this the right place to put this special consideration for hoppers
-				if(hopperInventory instanceof TileHopper) {
-					((TileHopper) hopperInventory).transferCooldown = 9;
+				if(hopperInventory instanceof TileEntityHopper) {
+					((TileEntityHopper) hopperInventory).transferCooldown = 9;
 				}
 				
 				return true;

@@ -1,7 +1,7 @@
 package agency.highlysuspect.hopper.gui;
 
 import agency.highlysuspect.hopper.HopperMod;
-import agency.highlysuspect.hopper.TileHopper;
+import agency.highlysuspect.hopper.TileEntityHopper;
 import cpw.mods.fml.common.network.IGuiHandler;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
@@ -20,8 +20,8 @@ public class GuiHandler implements IGuiHandler {
 		TileEntity te = world.getBlockTileEntity(x, y, z);
 		if(te == null) return null;
 		
-		if(id == GuiIds.HOPPER && te instanceof TileHopper) {
-			return new ContainerHopper(player.inventory, (TileHopper) te);
+		if(id == GuiIds.HOPPER && te instanceof TileEntityHopper) {
+			return new ContainerHopper(player.inventory, (TileEntityHopper) te);
 		}
 		
 		return null;

@@ -12,11 +12,11 @@ import net.minecraftforge.common.ForgeDirection;
 import javax.annotation.Nullable;
 import java.util.List;
 
-public class TileHopper extends TileEntity implements IInventory {
+public class TileEntityHopper extends TileEntity implements IInventory {
 	private final InventoryBasicExt inv = new InventoryBasicExt("container.hopper", 5) {
 		@Override
 		public void onInventoryChanged() {
-			TileHopper.this.onInventoryChanged();
+			TileEntityHopper.this.onInventoryChanged();
 		}
 	};
 	

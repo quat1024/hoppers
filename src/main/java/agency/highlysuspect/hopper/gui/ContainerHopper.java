@@ -1,6 +1,6 @@
 package agency.highlysuspect.hopper.gui;
 
-import agency.highlysuspect.hopper.TileHopper;
+import agency.highlysuspect.hopper.TileEntityHopper;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
@@ -8,7 +8,7 @@ import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 
 public class ContainerHopper extends Container {
-	public ContainerHopper(InventoryPlayer playerInventory, TileHopper hopper) {
+	public ContainerHopper(InventoryPlayer playerInventory, TileEntityHopper hopper) {
 		this.hopper = hopper;
 		
 		//hopper slots
@@ -32,7 +32,7 @@ public class ContainerHopper extends Container {
 		totalSlotCount = inventorySlots.size();
 	}
 	
-	private final TileHopper hopper;
+	private final TileEntityHopper hopper;
 	private final int hopperSlotCount;
 	private final int totalSlotCount;
 	

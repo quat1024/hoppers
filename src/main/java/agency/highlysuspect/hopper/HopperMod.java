@@ -73,7 +73,7 @@ public class HopperMod {
 		itemBlockHopper.setIconIndex(1);
 		
 		//Tile entities
-		GameRegistry.registerTileEntity(TileHopper.class, "hopper-hopperBlockTile");
+		GameRegistry.registerTileEntity(TileEntityHopper.class, "hopper-hopperBlockTile");
 		
 		//Language entries?
 		//TODO: Mess with LanguageRegistry.loadLangaugeTable and do this correctly lol

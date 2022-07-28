@@ -1,13 +1,13 @@
 package agency.highlysuspect.hopper.gui;
 
-import agency.highlysuspect.hopper.TileHopper;
+import agency.highlysuspect.hopper.TileEntityHopper;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.util.StringTranslate;
 import org.lwjgl.opengl.GL11;
 
 public class GuiHopper extends GuiContainer {
-	public GuiHopper(InventoryPlayer playerInventory, TileHopper hopper) {
+	public GuiHopper(InventoryPlayer playerInventory, TileEntityHopper hopper) {
 		super(new ContainerHopper(playerInventory, hopper));
 		
 		this.ySize = 133;

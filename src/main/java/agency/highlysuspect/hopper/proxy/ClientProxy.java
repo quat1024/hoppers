@@ -1,6 +1,6 @@
 package agency.highlysuspect.hopper.proxy;
 
-import agency.highlysuspect.hopper.TileHopper;
+import agency.highlysuspect.hopper.TileEntityHopper;
 import agency.highlysuspect.hopper.gui.GuiIds;
 import agency.highlysuspect.hopper.gui.GuiHopper;
 import agency.highlysuspect.hopper.render.RenderHopper;
@@ -26,8 +26,8 @@ public class ClientProxy extends CommonProxy {
 		TileEntity te = world.getBlockTileEntity(x, y, z);
 		if(te == null) return null;
 		
-		if(id == GuiIds.HOPPER && te instanceof TileHopper) {
-			return new GuiHopper(player.inventory, (TileHopper) te);
+		if(id == GuiIds.HOPPER && te instanceof TileEntityHopper) {
+			return new GuiHopper(player.inventory, (TileEntityHopper) te);
 		}
 		
 		return null;
