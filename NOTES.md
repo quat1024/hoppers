@@ -18,7 +18,7 @@ Use `java.util.logging.Logger`. If you have modded newer versions, this class mi
 
 ## Events
 
-Lifecycle events are registered by annotating them with `@Mod.PreInit`, `@Mod.Init` etc. For other events, stick the event handlers as methods in a class, annotate the methods with `ForgeSubscribe`, then call `MinecraftForge.EVENT_BUS.register(ThatClass.class).
+Lifecycle events are registered by annotating them with `@Mod.PreInit`, `@Mod.Init` etc. For other events, stick the event handlers as methods in a class, annotate the methods with `@ForgeSubscribe`, then call `MinecraftForge.EVENT_BUS.register(ThatClass.class)`.
 
 ## Sided Proxy
 
