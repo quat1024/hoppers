@@ -1,3 +1,8 @@
+import java.nio.file.Path
+import java.nio.file.FileSystems
+import java.nio.file.Files
+import java.nio.file.StandardCopyOption
+
 buildscript {
 	repositories {
 		//Currently my Voldeloom fork is required. See https://github.com/unascribed/voldeloom/pull/1
@@ -24,33 +29,52 @@ apply plugin: "com.unascribed.voldeloom"
 sourceCompatibility = 6
 targetCompatibility = 6
 
-def forgeVersion = "1.4.7-6.6.2.534"
-def minecraft_version = "1.4.7"
+// goofy zone
 
-def mcp = "mcp726a.zip";
+ext.forgeVersion = "1.4.7-6.6.2.534"
+ext.minecraftVersion = "1.4.7"
+
+def mcp = "mcp726a.zip"
 def forgeZip = "forge${forgeVersion}.zip"
 def mcpForged = "mcp726a-forged.zip"
 
-if (!file(mcp).exists()) {
-	println "Downloading ${mcp} from archive.org..."
-	file(mcp).withOutputStream {
-		it << new URL("https://archive.org/download/minecraftcoderpack/minecraftcoderpack.zip/minecraftcoderpack%2F${project.minecraft_version}%2F${mcp}").openStream()
-	}
-}
-if (!file(forgeZip).exists()) {
-	println "Downloading Forge ${forgeVersion} source..."
-	file(forgeZip).withOutputStream {
-		it << new URL("https://maven.minecraftforge.net/net/minecraftforge/forge/${forgeVersion}/forge-${forgeVersion}-src.zip").openStream()
-	}
-}
-if (!file(mcpForged).exists()) {
-	println "Merging Forge config into MCP..."
-	"./merge-forge.sh".execute()
+void get(File file, String url) {
+	println "Downloading ${url} to ${file}... (might take a bit)"
+	file.withOutputStream { it << new URL(url).openStream() }
+	if(file.length() == 0) throw new IllegalStateException("${url} downloaded as 0 bytes. Archive.org sometimes returns 0-byte files on 404s, double-check the url?")
 }
 
+if(!file(mcp).exists()) get(file(mcp), "https://archive.org/download/minecraftcoderpack/minecraftcoderpack.zip/minecraftcoderpack%2F${project.minecraftVersion}%2F${mcp}")
+if(!file(forgeZip).exists()) get(file(forgeZip), "https://maven.minecraftforge.net/net/minecraftforge/forge/${forgeVersion}/forge-${forgeVersion}-src.zip")
+if(!file(mcpForged).exists()) {
+	println "Merging Forge config into MCP..."
+	
+	Path mcpZipPath = file(mcp).toPath()
+	Path forgeZipPath = file(forgeZip).toPath()
+	Path mcpForgedPath = file(mcpForged).toPath()
+	
+	//start by copying forgeZip to mcpForged
+	Files.copy(mcpZipPath, mcpForgedPath, StandardCopyOption.REPLACE_EXISTING)
+	
+	//merge forge.zip/forge/fml/conf into mcp-forged.zip/conf/
+	FileSystems.newFileSystem(mcpForgedPath, null).withCloseable { mcpForgedFs ->
+		FileSystems.newFileSystem(forgeZipPath, null).withCloseable { forgeZipFs ->
+			Files.walk(forgeZipFs.getPath("/forge/fml/conf")).forEach { src -> 
+				if(Files.isRegularFile(src)) {
+					Path dst = mcpForgedFs.getPath(src.toString().substring("/forge/fml".length()))
+					println "Copying ${src} (${src.fileSystem}) into ${dst} (${dst.fileSystem})"
+					Files.createDirectories(dst.parent)
+					Files.copy(src, dst, StandardCopyOption.REPLACE_EXISTING)
+				}
+			}
+		}
+	}
+}
+// end goofy zone
+
 group = "agency.highlysuspect"
-archivesBaseName = "hopper-1.4.7"
-version = "0" //Remember to change it in HopperMod.java too.
+archivesBaseName = "hopper"
+version = "1.0"
 
 repositories {
 	maven { url "https://maven.fabricmc.net/" }
@@ -61,6 +85,7 @@ repositories {
 dependencies {
 	minecraft "com.mojang:minecraft:1.4.7"
 	forge "net.minecraftforge:forge:${forgeVersion}:universal@zip"
+	//noinspection GradlePackageUpdate, hahahahhaaaaaaahaha
 	implementation "com.google.guava:guava:12.0.1"
 	mappings files(mcpForged)
 }

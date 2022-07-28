@@ -22,9 +22,8 @@ import java.io.File;
 import java.util.logging.Logger;
 
 @Mod(
-	name = HopperMod.NAME,
-	version = HopperMod.VERSION,
-	modid = HopperMod.MODID
+	modid = HopperMod.MODID,
+	useMetadata = true //Fill the rest of the @Mod properties from mcmod.info.
 )
 @NetworkMod(
 	clientSideRequired = true,
@@ -33,7 +32,6 @@ import java.util.logging.Logger;
 public class HopperMod {
 	public static final String NAME = "Hopper";
 	public static final String MODID = "hopper";
-	public static final String VERSION = "0";
 	
 	public static final Logger LOGGER = Logger.getLogger(NAME);
 	
