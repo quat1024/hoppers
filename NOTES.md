@@ -33,6 +33,20 @@ These exist in various stages of Voldeloom's own development so expect weirdness
 
 Of course if you're just learning to mod 1.4 you will probably want to look for other mods of the time period, once you get the workspace set up it's the same as making any other Forge mod.
 
+## This project vs. Buildcraft
+
+Many of the tooling files in this project were taken from [Buildcraft 3.4.x](https://github.com/BuildCraft/BuildCraft/tree/3.4.x) but here are the changes I made.
+
+* Zip munging in `merge_forge.sh` replaced with an implementation in the buildscript using Java NIO. Now you can run it on Windows, doesn't break if you run the script twice, etc.
+* Defined a `minecraftVersion` parameter because one wasn't defined. The error wasn't noticed because it didn't crop up if you already had `mcp726a.zip` downloaded.
+* I try to crash early if any file downloads as zero bytes. In particular, the Internet Archive seems to respond to 404 requests with 0-byte files. If you are still having trouble you can browse the MCP archive and download `mcp726a.zip` yourself [here](https://ia601701.us.archive.org/view_archive.php?archive=/29/items/minecraftcoderpack/minecraftcoderpack.zip).
+
+## Uhh
+
+Voldeloom buildscripts don't work on Gradle 6 and 7 (and maybe 5) because it can't figure out where to download Forge. This is workaroundable by downloading Forge manually and providing it with a local file dependency. I'm not sure why this happens but it's something to investigate.
+
+Applying the Voldeloom plugin instantly crashes on Gradle 7 because of the `compile` -> `implementation` and `runtime` -> `runtimeOnly` rename. This needs a Voldeloom change, I have a PR for it.
+
 # How to write Forge 1.4.7 mods ~a retrospective~
 
 ## Documentation, tutorials
@@ -43,6 +57,7 @@ Kinda scant, but who's surprised. It's Minecraft.
 * Open source mods, especially [Buildcraft](https://github.com/BuildCraft/BuildCraft/tree/3.4.x).
 * [FML 1.4](https://github.com/minecraftforge/fml/tree/1.4) source tree has comments sometimes...
 * Google lol
+* This document, apparently
 * Uhhhh that's about it
 
 ## `@Mod`, basic forge interaction, etc
