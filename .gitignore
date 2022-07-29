@@ -6,13 +6,17 @@
 /.settings
 /.metadata
 /download
+.idea/
+
+# gradle haxx
 /mcp726a.zip
 /mcp726a-forged.zip
-/forge1.4.7-6.6.2.534.zip
+/forge*.zip
+/forge*.jar
 
+# personal use
 lol.sh
 buildcraft*.jar
-.idea/
 
 # Dammit krita
 *.png~

@@ -27,7 +27,8 @@ def forgeVersion = "1.4.7-6.6.2.534"
 def minecraftVersion = "1.4.7"
 
 def mcp = "mcp726a.zip"
-def forgeZip = "forge${forgeVersion}.zip"
+def forgeSource = "forge${forgeVersion}-src.zip"
+def forgeCompiled = "forge${forgeVersion}.jar" //hack hack hack
 def mcpForged = "mcp726a-forged.zip"
 
 void get(File file, String url) {
@@ -37,12 +38,12 @@ void get(File file, String url) {
 }
 
 if(!file(mcp).exists()) get(file(mcp), "https://archive.org/download/minecraftcoderpack/minecraftcoderpack.zip/minecraftcoderpack%2F${minecraftVersion}%2F${mcp}")
-if(!file(forgeZip).exists()) get(file(forgeZip), "https://maven.minecraftforge.net/net/minecraftforge/forge/${forgeVersion}/forge-${forgeVersion}-src.zip")
+if(!file(forgeSource).exists()) get(file(forgeSource), "https://maven.minecraftforge.net/net/minecraftforge/forge/${forgeVersion}/forge-${forgeVersion}-src.zip")
 if(!file(mcpForged).exists()) {
 	println "Merging Forge config into MCP..."
 	
 	Path mcpZipPath = file(mcp).toPath()
-	Path forgeZipPath = file(forgeZip).toPath()
+	Path forgeZipPath = file(forgeSource).toPath()
 	Path mcpForgedPath = file(mcpForged).toPath()
 	
 	Files.copy(mcpZipPath, mcpForgedPath, StandardCopyOption.REPLACE_EXISTING)
@@ -62,6 +63,13 @@ if(!file(mcpForged).exists()) {
 		}
 	}
 }
+
+//EXTRA funny zone because something about Voldeloom is broken on gradle 6
+if(!file(forgeCompiled).exists()) {
+	get(file(forgeCompiled), "https://maven.minecraftforge.net/net/minecraftforge/forge/${forgeVersion}/forge-${forgeVersion}-universal.zip")
+}
+//END EXTRA funny zone
+
 //end goofy zone
 
 group = "agency.highlysuspect"
@@ -76,7 +84,12 @@ repositories {
 
 dependencies {
 	minecraft "com.mojang:minecraft:1.4.7"
-	forge "net.minecraftforge:forge:${forgeVersion}:universal@zip"
+	
+	//doesnt work because of EXTRA funny zone
+	//forge "net.minecraftforge:forge:${forgeVersion}:universal@zip"
+	forge files(forgeCompiled)
+	
+	
 	//noinspection GradlePackageUpdate, hahahahhaaaaaaahaha
 	implementation "com.google.guava:guava:12.0.1"
 	mappings files(mcpForged)
