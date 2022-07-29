@@ -5,13 +5,14 @@ import java.nio.file.StandardCopyOption
 
 buildscript {
 	repositories {
+		mavenLocal()
 		mavenCentral()
 		gradlePluginPortal()
 		maven { url "https://maven.fabricmc.net" }
 		maven { url "https://repo.sleeping.town" }
 	}
 	dependencies {
-		classpath "com.unascribed:voldeloom:1.0.1+1.4.7"
+		classpath "com.unascribed:voldeloom:1.0.1+1.4.7wack"
 	}
 }
 
