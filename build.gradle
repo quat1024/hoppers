@@ -12,7 +12,7 @@ buildscript {
 		maven { url "https://repo.sleeping.town" }
 	}
 	dependencies {
-		classpath "com.unascribed:voldeloom:1.0.1+1.4.7wacky"
+		classpath "com.unascribed:voldeloom:1.0.1"
 	}
 }
 
@@ -64,11 +64,11 @@ if(!file(mcpForged).exists()) {
 	}
 }
 
-//EXTRA funny zone because something about Voldeloom is broken on gradle 6
+//[1]: Voldeloom can't resolve the Forge dependency on Gradle 6+ for some reason, hack-fix it by providing as a local file for now.
+//Not required if you invoke with gradle 4.
 if(!file(forgeCompiled).exists()) {
 	get(file(forgeCompiled), "https://maven.minecraftforge.net/net/minecraftforge/forge/${forgeVersion}/forge-${forgeVersion}-universal.zip")
 }
-//END EXTRA funny zone
 
 //end goofy zone
 
@@ -85,7 +85,7 @@ repositories {
 dependencies {
 	minecraft "com.mojang:minecraft:1.4.7"
 	
-	//doesnt seem to work because of EXTRA funnyzone stuff
+	//see [1]
 	//forge "net.minecraftforge:forge:${forgeVersion}:universal@zip"
 	forge files(forgeCompiled)
 	
