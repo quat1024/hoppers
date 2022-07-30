@@ -4,22 +4,17 @@ on: [push, pull_request, workflow_dispatch]
 
 jobs:
   build:
-    strategy:
-      fail-fast: false
-      matrix: 
-        java: [8, 17]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-java@v2
         with:
           distribution: 'temurin'
-          java-version: ${{ matrix.java }}
+          java-version: '17'
 
       - name: Build with Gradle™
         uses: gradle/gradle-build-action@v2
         with:
-          cache-disabled: true
           arguments: build --stacktrace --info
 
       - name: Upload artifacts™
