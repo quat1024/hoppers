@@ -4,7 +4,9 @@ Adds hoppers to Minecraft! Finally, an easy-to-use system for transporting items
 
 # Build instructions
 
-`./gradlew build` should work, then grab the jar out of `/build/libs`.
+You can build the mod with `./gradlew build` and retrieve the result from `./build/libs`.
+
+I am putting out Gradle-related fires. If you are having compilation issues, delete `.gradle` then try again [on the `old` branch](https://github.com/quat1024/hoppers/tree/old).
 
 # Thanks
 

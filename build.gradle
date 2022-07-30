@@ -56,12 +56,13 @@ if(!file(mcpForged).exists()) {
 	
 	Files.copy(mcpZipPath, mcpForgedPath, StandardCopyOption.REPLACE_EXISTING)
 	
-	//modify the zip in-place.
+	//modify the zip in-place with zip filesystem.
 	//Take forge's mcp config (located at forge.zip/forge/fml/conf) and paste it over mcp.zip (at mcp726a-forged.zip/conf)
-	FileSystems.newFileSystem(mcpForgedPath, null).withCloseable { mcpForgedFs ->
-		FileSystems.newFileSystem(forgeZipPath, null).withCloseable { forgeZipFs ->
-			Files.walk(forgeZipFs.getPath("/forge/fml/conf")).forEach { src -> 
-				if(Files.isRegularFile(src)) {
+	//Why the ClassLoader type ascription? Because of this https://bugs.openjdk.org/browse/JDK-8223197
+	FileSystems.newFileSystem(mcpForgedPath, (ClassLoader) null).withCloseable {mcpForgedFs ->
+		FileSystems.newFileSystem(forgeZipPath, (ClassLoader) null).withCloseable {forgeZipFs ->
+			Files.walk(forgeZipFs.getPath("/forge/fml/conf")).forEach {src ->
+				if (Files.isRegularFile(src)) {
 					Path dst = mcpForgedFs.getPath(src.toString().substring("/forge/fml".length())) //hopefully this works lol
 					println "Copying ${src} (${src.fileSystem}) into ${dst} (${dst.fileSystem})"
 					Files.createDirectories(dst.parent)
