@@ -36,7 +36,6 @@ def minecraftVersion = "1.4.7"
 
 def mcp = "mcp726a.zip"
 def forgeSource = "forge${forgeVersion}-src.zip"
-def forgeCompiled = "forge${forgeVersion}.jar" //hack hack hack
 def mcpForged = "mcp726a-forged.zip"
 
 void get(File file, String url) {
@@ -73,12 +72,6 @@ if(!file(mcpForged).exists()) {
 	}
 }
 
-//[1]: Voldeloom can't resolve the Forge dependency on Gradle 6+ for some reason, hack-fix it by providing as a local file for now.
-//Not required if you invoke with gradle 4.
-if(!file(forgeCompiled).exists()) {
-	get(file(forgeCompiled), "https://maven.minecraftforge.net/net/minecraftforge/forge/${forgeVersion}/forge-${forgeVersion}-universal.zip")
-}
-
 //end goofy zone
 
 group = "agency.highlysuspect"
@@ -86,17 +79,26 @@ archivesBaseName = "hopper"
 version = "1.0"
 
 repositories {
-	maven { url "https://maven.fabricmc.net/" }
-	maven { url "https://maven.minecraftforge.net/" }
-	maven { url "https://repo.spongepowered.org/maven" }
+	maven {
+		url = "https://maven.minecraftforge.net/"
+		content {
+			includeGroup "net.minecraftforge"
+			
+			//Gradle 5 and above, by default, assume an artifact doesn't exist
+			//if it can't find a maven_metadata.xml, to cut down on the amount
+			//of spurious 404 requests. But Forge doesn't publish any maven pom
+			//files for their old versions. This opts in to the old behavior.
+			metadataSources {
+				artifact()
+			}
+		}
+	}
 }
 
 dependencies {
 	minecraft "com.mojang:minecraft:1.4.7"
 	
-	//see [1]
-	//forge "net.minecraftforge:forge:${forgeVersion}:universal@zip"
-	forge files(forgeCompiled)
+	forge "net.minecraftforge:forge:${forgeVersion}:universal@zip"
 	
 	//noinspection GradlePackageUpdate, hahahahhaaaaaaahaha
 	implementation "com.google.guava:guava:12.0.1"
