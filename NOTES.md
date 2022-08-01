@@ -4,13 +4,17 @@ Just taking notes as I figure this stuff out!
 
 [Voldeloom](https://github.com/unascribed/voldeloom/) is a hacked-up copy of Fabric Loom, developed by TwilightFlower and unascribed, that wrangles old MCP mapping sets and is able to build Forge mods for very old versions. It builds off the zillion years of experience the Minecraft communty has accumulated with developing file-remappers and Minecraft downloaders and stuff, to provide a working Minecraft toolchain without the brittle shell-scripts and the jank. Just kidding it's janky.
 
-You need a version of Java new enough to support the language features that Voldeloom uses, but old enough to compile to Java 6 which is what these versions of Forge were written for. Certain important Forge tasks, like scanning the classpath for `@Mod` annotations, fail when something exists that is compiled for a too-new Java version.
+## Java version woes
 
-Here is where I *would* put the directions to "make sure that you're using specifically only Java 11!" because I heard that's the only one that works, but I just checked and apparently I've been using Java 8 the whole time. Whoops.
+For compiling, you need a JDK old enough to compile to Java 6-compatible code, which is what these versions of Forge were written for. Certain important Forge tasks, like scanning the classpath for `@Mod` annotations, fail when something exists that is compiled for a too-new Java version. The last version of Java able to target Java 6 is Java 11.
 
-IntelliJ users can go to the "Project Structure" dialog, set the JDK to an installation of Java 8 and the Project Language Level to `6`, then go to `Settings -> Build Execution Deployment -> Build Tools -> Gradle` and ensure that the correct JDK version is being used (seriously why does this setting have a mind of its own). Also when invoking `./gradlew` outside of your IDE, ensure that `JAVA_HOME` points to the correct Java version.
+Gradle 7 requires Java 16, though, to run. Here, I use the gradle "Toolchains" feature to ensure that compilation tasks are always done using a Java 11 compiler.
+
+## Running and debugging
 
 Run configurations were also not adjusted away from Fabric so they're just flat-out broken. Dont worry about it everything is fine!!!!! Instead, build with the usual `./gradlew build` release process then copy it into a regular Forge client installation. I suggest making a small shell script that does this then invoking it as your MultiMC/PolyMC "prelaunch command". Kinda cursed but it works.
+
+You will need to point your launcher at a Java 8 JRE to play the game. You may also need to toss [LegacyJavaFixer](https://mcarchive.net/mods/legacy-java-fixer) in the coremods folder.
 
 For debugging, you might have some luck with [remote debugging](https://www.jetbrains.com/help/idea/tutorial-remote-debug.html) but the mapping set will be different in your workspace and in the forge client installation, so things will probably be pretty busted. Logspam debugging is your friend.
 
@@ -29,9 +33,13 @@ Existing codebases retrofitted with Voldeloom:
 * [ChiselRetro](https://git.sleeping.town/unascribed/ChiselRetro)
 * [Buildcraft 3.4.x](https://github.com/BuildCraft/BuildCraft/tree/3.4.x) (migrated from Ant)
 
-These exist in various stages of Voldeloom's own development so expect weirdness. If you'd like to compile them yourself, you may need to make sure Voldeloom's version is `1.0.1` or newer because of [this](https://github.com/unascribed/voldeloom/pull/1).
+These exist in various stages of Voldeloom's own development so expect weirdness. If you'd like to compile them yourself, there's a couple things to consider.
 
-Of course if you're just learning to mod 1.4 you will probably want to look for other mods of the time period, once you get the workspace set up it's the same as making any other Forge mod.
+First, you may need to make sure Voldeloom's version is `1.0.1` or newer because of [this](https://github.com/unascribed/voldeloom/pull/1), and if you'd like to use Gradle 7 make sure you get `1.0.2`.
+
+Also I'm pretty sure that this is the first Voldeloom mod that can be compiled without worrying too much about your Java version numbers. Other projects will be more picky. Many existing projects use Gradle 4.x, which crashes ran with today's Java and doesn't have the toolchains feature, so you will actually need to install a Java 8 or 11 JDK yourself and make sure it is used when invoking Gradle. IntelliJ users can go to the "Project Structure" dialog, set the JDK to an installation of Java 8 and the Project Language Level to `6`, then go to `Settings -> Build Execution Deployment -> Build Tools -> Gradle` and ensure that the correct JDK version is being used (this setting has a mind of its own) so the tool window works. Make sure `$JAVA_HOME` is approrpriately set from any terminals or scripts used to invoke `./gradlew`, too.
+
+Of course if you're just learning to mod 1.4, you will probably want to look for other mods of the time period too, once you get the workspace set up it's the same as making any other Forge mod.
 
 ## This project vs. Buildcraft
 
