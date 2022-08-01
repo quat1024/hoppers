@@ -20,4 +20,5 @@ buildcraft*.jar
 
 # Dammit krita
 *.png~
+*.kra~
 *autosave.kra
